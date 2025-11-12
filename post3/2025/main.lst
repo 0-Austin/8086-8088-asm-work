@@ -1,0 +1,97 @@
+Microsoft (R) Macro Assembler Version 6.11		    11/12/25 10:38:25
+tempfile.asm						     Page 1 - 1
+
+
+ 0000				DATAS SEGMENT
+ 0000 0A 00				BUFFER DB 10,0,10 DUP(0)     ;最多输入10个字符
+       000A [
+        00
+       ]
+ 000C 00			    COUNT  DB 0                    ; 记录 'a' 出现次数
+ 000D 65 6E 74 65 72 3A		    MSG1   DB 'enter:$'
+       24
+ 0014 0D 0A 72 65 74 75		    MSG2   DB 0DH,0AH,'return: $'
+       72 6E 3A 20 24
+				    ;此处输入数据段代码  
+ 001F				DATAS ENDS
+
+ 0000				STACKS SEGMENT
+				    ;此处输入堆栈段代码
+ 0000				STACKS ENDS
+
+ 0000				CODES SEGMENT
+				    ASSUME CS:CODES,DS:DATAS,SS:STACKS
+ 0000				START:
+ 0000  B8 ---- R		    MOV AX,DATAS
+ 0003  8E D8			    MOV DS,AX
+				    ;此处输入代码段代码
+ 0005  BA 000D R		    MOV DX, OFFSET MSG1
+ 0008  B4 09			    MOV AH, 09H
+ 000A  CD 21			    INT 21H
+				    ; 从键盘输入字符串 (DOS 0Ah)缓冲式键盘输入，DX指向缓冲区
+ 000C  BA 0000 R		    MOV DX, OFFSET BUFFER
+ 000F  B4 0A			    MOV AH, 0AH
+ 0011  CD 21			    INT 21H
+				    ; 初始化
+				    ;BUFFER偏移量+0为最大可输入字符，+1为实际输入字符，+2为输入的第一个字符。。。
+ 0013  8A 0E 0001 R		    MOV CL, BUFFER[1]   ; 实际输入字符个数
+ 0017  BE 0002 R		    MOV SI, OFFSET BUFFER + 2 ; 指向输入内容
+ 001A  C6 06 000C R 00		    MOV COUNT,0
+ 001F				CHECK_LOOP:
+ 001F  80 F9 00			    CMP CL, 0
+ 0022  74 0F			    JE SHOW_RESULT       ; 若扫描完则结束
+ 0024  8A 04			    MOV AL, [SI]         ; 取当前字符
+ 0026  3C 61			    CMP AL, 'a'
+ 0028  75 04			    JNE NEXT_CHAR
+ 002A  FE 06 000C R		    INC COUNT            ; 若等于 'a'，计数加1
+ 002E				NEXT_CHAR:
+ 002E  46			    INC SI	;偏移量+1，指向下一个字符
+ 002F  FE C9			    DEC CL	;CL-1，要处理的字符数减1
+ 0031  EB EC			    JMP CHECK_LOOP
+				; 显示结果
+ 0033				SHOW_RESULT:
+ 0033  BA 0014 R		    MOV DX,OFFSET MSG2
+ 0036  B4 09			    MOV AH,09H
+ 0038  CD 21			    INT 21H
+				    ; COUNT 是数字，把它转成 ASCII 并显示
+ 003A  A0 000C R		    MOV AL,COUNT
+ 003D  04 30			    ADD AL,30H          ; 转成字符
+ 003F  8A D0			    MOV DL,AL
+ 0041  B4 02			    MOV AH,02H
+ 0043  CD 21			    INT 21H
+
+ 0045  B4 4C			    MOV AH,4CH
+ 0047  CD 21			    INT 21H
+ 0049				CODES ENDS
+				    END START
+
+Microsoft (R) Macro Assembler Version 6.11		    11/12/25 10:38:25
+tempfile.asm						     Symbols 2 - 1
+
+
+
+
+Segments and Groups:
+
+                N a m e                 Size     Length   Align   Combine Class
+
+CODES  . . . . . . . . . . . . .	16 Bit	 0049	  Para	  Private 
+DATAS  . . . . . . . . . . . . .	16 Bit	 001F	  Para	  Private 
+STACKS . . . . . . . . . . . . .	16 Bit	 0000	  Para	  Private 
+
+
+Symbols:
+
+                N a m e                 Type     Value    Attr
+
+BUFFER . . . . . . . . . . . . .	Byte	 0000	  DATAS	
+CHECK_LOOP . . . . . . . . . . .	L Near	 001F	  CODES	
+COUNT  . . . . . . . . . . . . .	Byte	 000C	  DATAS	
+MSG1 . . . . . . . . . . . . . .	Byte	 000D	  DATAS	
+MSG2 . . . . . . . . . . . . . .	Byte	 0014	  DATAS	
+NEXT_CHAR  . . . . . . . . . . .	L Near	 002E	  CODES	
+SHOW_RESULT  . . . . . . . . . .	L Near	 0033	  CODES	
+START  . . . . . . . . . . . . .	L Near	 0000	  CODES	
+
+	   0 Warnings
+	   0 Errors
