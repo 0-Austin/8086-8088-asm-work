@@ -1,0 +1,112 @@
+Microsoft (R) Macro Assembler Version 6.11		    11/12/25 10:15:11
+tempfile.asm						     Page 1 - 1
+
+
+ 0000				DATAS SEGMENT
+ 0000 25				x      DB 25H
+ 0001 28			    y      DB 28H
+ 0002 27			    z      DB 27H
+ 0003 00			    media  DB 00H
+				    ;此处输入数据段代码  
+ 0004				DATAS ENDS
+
+ 0000				STACKS SEGMENT
+				    ;此处输入堆栈段代码
+ 0000				STACKS ENDS
+
+ 0000				CODES SEGMENT
+				    ASSUME CS:CODES,DS:DATAS,SS:STACKS
+ 0000				START:
+ 0000  B8 ---- R		    MOV AX,DATAS
+ 0003  8E D8			    MOV DS,AX
+				    ;此处输入代码段代码
+ 0005  A0 0000 R		    MOV AL, x
+ 0008  3A 06 0001 R		    CMP AL, y
+ 000C  7C 02			    JL  X_LE_Y       ; 若 x < y，跳到 X_LE_Y
+ 000E  EB 2A			    JMP Y_LE_X       ; 否则 y < x,跳到 Y_LE_X
+
+				;情况1:x < y
+ 0010				X_LE_Y:
+ 0010  A0 0001 R			MOV AL,y
+ 0013  3A 06 0002 R		    CMP AL,z
+ 0017  7C 11			    JL  Y_LE_Z       ; 若 y < z → x < y < z → media = y
+ 0019  A0 0000 R		    MOV AL,x
+ 001C  3A 06 0002 R		    CMP AL,z
+ 0020  7C 10			    JL  X_LE_Z       ; 若 x < z < y → media = z
+				    ; 否则 z < x < y → media = x
+ 0022  A0 0000 R		    MOV AL,x
+ 0025  A2 0003 R		    MOV media,AL
+ 0028  EB 3A			    JMP ENDING
+
+ 002A				Y_LE_Z:
+ 002A  A0 0001 R		    MOV AL, y        ; x < y < z
+ 002D  A2 0003 R		    MOV media, AL
+ 0030  EB 32			    JMP ENDING
+
+ 0032				X_LE_Z:
+ 0032  A0 0002 R		    MOV AL, z        ; x < z < y
+ 0035  A2 0003 R		    MOV media, AL
+ 0038  EB 2A			    JMP ENDING
+
+				; 情况2:y < x
+ 003A				Y_LE_X:
+ 003A  A0 0000 R			MOV AL,x
+ 003D  3A 06 0002 R		    CMP AL,z
+ 0041  7C 11			    JL  X_LE_Z2      ; 若 x < z → y < x < z → media = x
+ 0043  A0 0001 R		    MOV AL,y
+ 0046  3A 06 0002 R		    CMP AL,z
+ 004A  7C 10			    JL  Y_LE_Z2      ; 若 y < z < x → media = z
+				    ; 否则 z < y < x → media = y
+ 004C  A0 0001 R		    MOV AL,y
+ 004F  A2 0003 R		    MOV media, AL
+ 0052  EB 10			    JMP ENDING
+
+ 0054				X_LE_Z2:
+ 0054  A0 0000 R		    MOV AL,x        ; y < x < z
+ 0057  A2 0003 R		    MOV media,AL
+ 005A  EB 08			    JMP ENDING
+
+ 005C				Y_LE_Z2:
+ 005C  A0 0002 R		    MOV AL,z        ; y < z < x
+ 005F  A2 0003 R		    MOV media,AL
+ 0062  EB 00			    JMP ENDING
+ 0064				ENDING:
+ 0064  B4 4C			    MOV AH,4CH
+ 0066  CD 21			    INT 21H
+ 0068				CODES ENDS
+				    END START
+
+Microsoft (R) Macro Assembler Version 6.11		    11/12/25 10:15:11
+tempfile.asm						     Symbols 2 - 1
+
+
+
+
+Segments and Groups:
+
+                N a m e                 Size     Length   Align   Combine Class
+
+CODES  . . . . . . . . . . . . .	16 Bit	 0068	  Para	  Private 
+DATAS  . . . . . . . . . . . . .	16 Bit	 0004	  Para	  Private 
+STACKS . . . . . . . . . . . . .	16 Bit	 0000	  Para	  Private 
+
+
+Symbols:
+
+                N a m e                 Type     Value    Attr
+
+ENDING . . . . . . . . . . . . .	L Near	 0064	  CODES	
+START  . . . . . . . . . . . . .	L Near	 0000	  CODES	
+X_LE_Y . . . . . . . . . . . . .	L Near	 0010	  CODES	
+X_LE_Z2  . . . . . . . . . . . .	L Near	 0054	  CODES	
+X_LE_Z . . . . . . . . . . . . .	L Near	 0032	  CODES	
+Y_LE_X . . . . . . . . . . . . .	L Near	 003A	  CODES	
+Y_LE_Z2  . . . . . . . . . . . .	L Near	 005C	  CODES	
+Y_LE_Z . . . . . . . . . . . . .	L Near	 002A	  CODES	
+media  . . . . . . . . . . . . .	Byte	 0003	  DATAS	
+x  . . . . . . . . . . . . . . .	Byte	 0000	  DATAS	
+y  . . . . . . . . . . . . . . .	Byte	 0001	  DATAS	
+z  . . . . . . . . . . . . . . .	Byte	 0002	  DATAS	
+
+	   0 Warnings
+	   0 Errors
