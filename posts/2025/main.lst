@@ -1,0 +1,69 @@
+Microsoft (R) Macro Assembler Version 6.11		    11/11/25 16:31:10
+tempfile.asm						     Page 1 - 1
+
+
+ 0000				DATAS SEGMENT  
+ 0000 00			    BUF DB ? 
+ 0001 00			    BUF1 DB ?
+ 0002 00			    BUF2 DB ?
+ 0003 00			    BUF3 DB ?
+ 0004				DATAS ENDS
+
+ 0000				STACKS SEGMENT
+				   
+ 0000				STACKS ENDS
+
+ 0000				CODES SEGMENT
+				    ASSUME CS:CODES, DS:DATAS, SS:STACKS
+ 0000				START:
+ 0000  B8 ---- R		    MOV AX, DATAS
+ 0003  8E D8			    MOV DS, AX
+					
+ 0005  B4 01				MOV AH,01H
+ 0007  CD 21				INT 21H	
+ 0009  2C 30				SUB AL,30H
+ 000B  A2 0000 R			MOV BUF,AL
+					
+ 000E  D0 E0				SAL AL,1
+ 0010  A2 0001 R			MOV BUF1,AL
+				 	
+ 0013  D0 E0			 	SAL AL,1
+ 0015  A2 0002 R		 	MOV BUF2,AL
+ 0018  D0 E0				SAL AL,1
+				 
+ 001A  02 06 0001 R			ADD AL,BUF1
+ 001E  A2 0003 R			MOV BUF3,AL
+					
+				    ; ³ÌÐò½áÊø
+ 0021  B4 4C			    MOV AH, 4CH
+ 0023  CD 21			    INT 21H
+ 0025				CODES ENDS
+				    END START
+
+Microsoft (R) Macro Assembler Version 6.11		    11/11/25 16:31:10
+tempfile.asm						     Symbols 2 - 1
+
+
+
+
+Segments and Groups:
+
+                N a m e                 Size     Length   Align   Combine Class
+
+CODES  . . . . . . . . . . . . .	16 Bit	 0025	  Para	  Private 
+DATAS  . . . . . . . . . . . . .	16 Bit	 0004	  Para	  Private 
+STACKS . . . . . . . . . . . . .	16 Bit	 0000	  Para	  Private 
+
+
+Symbols:
+
+                N a m e                 Type     Value    Attr
+
+BUF1 . . . . . . . . . . . . . .	Byte	 0001	  DATAS	
+BUF2 . . . . . . . . . . . . . .	Byte	 0002	  DATAS	
+BUF3 . . . . . . . . . . . . . .	Byte	 0003	  DATAS	
+BUF  . . . . . . . . . . . . . .	Byte	 0000	  DATAS	
+START  . . . . . . . . . . . . .	L Near	 0000	  CODES	
+
+	   0 Warnings
+	   0 Errors
